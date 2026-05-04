@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Python Jeopardy!</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Python Jeopardy!</h1>
+    <div id="scoreboard"></div>
+    <div id="header-controls">
+      <button id="add-team-btn">+ Add Team</button>
+      <button id="reset-btn">Reset Game</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="board"></div>
+  </main>
+
+  <!-- Setup screen shown before game starts -->
+  <div id="setup-overlay">
+    <div id="setup-modal">
+      <h2>Welcome to Python Jeopardy!</h2>
+      <p>Add at least one team to begin.</p>
+      <div id="setup-teams"></div>
+      <div id="setup-add">
+        <input type="text" id="setup-team-input" placeholder="Team name..." maxlength="30" />
+        <button id="setup-add-btn">Add Team</button>
+      </div>
+      <button id="start-game-btn" disabled>Start Game</button>
+    </div>
+  </div>
+
+  <!-- Question Modal -->
+  <div id="modal-overlay" class="hidden">
+    <div id="modal">
+      <button id="close-modal-btn" aria-label="Close">&times;</button>
+      <div id="modal-meta">
+        <span id="modal-category"></span>
+        <span id="modal-value"></span>
+      </div>
+      <div id="modal-question"></div>
+      <div id="modal-answer" class="hidden">
+        <div id="answer-text"></div>
+        <div id="explanation-text"></div>
+      </div>
+      <div id="modal-actions">
+        <button id="show-answer-btn">Show Answer</button>
+        <div id="award-section" class="hidden">
+          <p class="award-label">Award points to:</p>
+          <div id="team-award-buttons"></div>
+          <button id="no-award-btn">No One / Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div id="final-overlay" class="hidden">
+    <div id="final-modal">
+      <h2>Game Over!</h2>
+      <div id="final-scores"></div>
+      <button id="play-again-btn">Play Again</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
