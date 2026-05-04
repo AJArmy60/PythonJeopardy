@@ -1,0 +1,179 @@
+{
+  "categories": [
+    {
+      "name": "Python Basics",
+      "clues": [
+        {
+          "value": 200,
+          "question": "This keyword is used to create a variable that cannot be changed after assignment.",
+          "answer": "What is const? (Note: Python doesn't have const, but this tests understanding that Python uses 'const' concept with naming conventions like ALL_CAPS)",
+          "explanation": "Python doesn't have a true const keyword. Variables are mutable by default. Developers use naming conventions (e.g., CONSTANT_NAME) to indicate a constant value."
+        },
+        {
+          "value": 400,
+          "question": "This data type represents a sequence of characters enclosed in quotes.",
+          "answer": "What is a string?",
+          "explanation": "Strings in Python can be created with single quotes (''), double quotes (\"\"), or triple quotes (for multi-line). They are immutable sequences."
+        },
+        {
+          "value": 600,
+          "question": "True or False: In Python, 'None' is equal to 0.",
+          "answer": "What is False?",
+          "explanation": "None is Python's null value and is distinct from 0, False, empty strings, or empty collections. It represents the absence of a value."
+        },
+        {
+          "value": 800,
+          "question": "This function returns the length of a string, list, or other sequence.",
+          "answer": "What is len()?",
+          "explanation": "len() is a built-in function that returns the number of items in an object. For strings, it counts characters; for lists, it counts elements."
+        },
+        {
+          "value": 1000,
+          "question": "This operator performs exponentiation in Python (e.g., 2 to the power of 3).",
+          "answer": "What is the ** operator?",
+          "explanation": "The ** operator raises the left operand to the power of the right operand. For example, 2 ** 3 equals 8. The ^ operator in Python performs XOR, not exponentiation."
+        }
+      ]
+    },
+    {
+      "name": "Functions",
+      "clues": [
+        {
+          "value": 200,
+          "question": "This keyword is used to define a function in Python.",
+          "answer": "What is def?",
+          "explanation": "The 'def' keyword declares a function. Functions allow you to reuse code and organize your program logically."
+        },
+        {
+          "value": 400,
+          "question": "This keyword inside a function sends a value back to the caller.",
+          "answer": "What is return?",
+          "explanation": "The 'return' statement exits a function and optionally returns a value to the caller. Without return, a function returns None by default."
+        },
+        {
+          "value": 600,
+          "question": "Parameters with default values must come after those without them in a function definition. True or False?",
+          "answer": "What is True?",
+          "explanation": "In Python, parameters with default values must follow parameters without defaults. For example, def func(a, b=5) is valid, but def func(a=5, b) is a syntax error."
+        },
+        {
+          "value": 800,
+          "question": "This feature allows a function to accept any number of positional arguments using this symbol: *",
+          "answer": "What is *args?",
+          "explanation": "*args allows a function to accept a variable number of non-keyword arguments as a tuple. For example, def func(*args) lets you call func(1, 2, 3, 4)."
+        },
+        {
+          "value": 1000,
+          "question": "This is the term for a function defined inside another function that has access to the outer function's variables.",
+          "answer": "What is a closure?",
+          "explanation": "A closure is a nested function that 'remembers' variables from its enclosing scope even after the outer function has finished executing. This enables powerful patterns like decorators and function factories."
+        }
+      ]
+    },
+    {
+      "name": "Data Structures",
+      "clues": [
+        {
+          "value": 200,
+          "question": "This data structure is ordered, changeable, and allows duplicates.",
+          "answer": "What is a list?",
+          "explanation": "Lists in Python are created with square brackets [], are mutable (can be changed), and maintain insertion order. They are one of the most commonly used data structures."
+        },
+        {
+          "value": 400,
+          "question": "This data structure is unordered, unchangeable, and does not allow duplicates.",
+          "answer": "What is a set?",
+          "explanation": "Sets are created with curly braces {} or the set() function. They are useful for removing duplicates and performing set operations like union, intersection, and difference."
+        },
+        {
+          "value": 600,
+          "question": "True or False: Tuples are mutable, meaning you can change their elements after creation.",
+          "answer": "What is False?",
+          "explanation": "Tuples are immutable sequences created with parentheses (). Once created, their elements cannot be changed. However, if a tuple contains a mutable object like a list, that object can be modified."
+        },
+        {
+          "value": 800,
+          "question": "This data structure uses key-value pairs and is created with curly braces or the dict() function.",
+          "answer": "What is a dictionary?",
+          "explanation": "Dictionaries map unique keys to values. They are mutable, unordered (in Python 3.6+, insertion order is preserved), and very efficient for lookups."
+        },
+        {
+          "value": 1000,
+          "question": "This method returns a list of all values in a dictionary that match a given condition, using a concise syntax in a single line.",
+          "answer": "What is a list comprehension or dictionary comprehension?",
+          "explanation": "Comprehensions are a concise way to create lists, sets, or dictionaries. For example, [x*2 for x in range(5)] creates [0, 2, 4, 6, 8]. They're more efficient than loops and are considered Pythonic."
+        }
+      ]
+    },
+    {
+      "name": "Loops & Control Flow",
+      "clues": [
+        {
+          "value": 200,
+          "question": "This keyword exits a loop immediately.",
+          "answer": "What is break?",
+          "explanation": "The 'break' statement terminates the current loop and continues execution after the loop block."
+        },
+        {
+          "value": 400,
+          "question": "This keyword skips the rest of the current iteration and moves to the next iteration.",
+          "answer": "What is continue?",
+          "explanation": "The 'continue' statement jumps to the next iteration of a loop, skipping any code after it in the current iteration."
+        },
+        {
+          "value": 600,
+          "question": "This function returns a sequence of numbers and is commonly used in for loops.",
+          "answer": "What is range()?",
+          "explanation": "range(start, stop, step) generates an immutable sequence of numbers. range(5) produces 0, 1, 2, 3, 4. It's memory-efficient for large sequences."
+        },
+        {
+          "value": 800,
+          "question": "This clause executes after a loop completes normally (without a break).",
+          "answer": "What is else?",
+          "explanation": "A for or while loop can have an else clause that runs if the loop finishes without encountering a break. This is often used to detect when a search was unsuccessful."
+        },
+        {
+          "value": 1000,
+          "question": "This function pairs elements from multiple iterables and is used with for loops to iterate over two lists simultaneously.",
+          "answer": "What is zip()?",
+          "explanation": "zip() combines elements from multiple iterables into tuples. For example, zip([1, 2, 3], ['a', 'b', 'c']) produces [(1, 'a'), (2, 'b'), (3, 'c')]. It stops at the shortest iterable."
+        }
+      ]
+    },
+    {
+      "name": "Error Handling & Exceptions",
+      "clues": [
+        {
+          "value": 200,
+          "question": "This keyword begins a block that may raise an exception.",
+          "answer": "What is try?",
+          "explanation": "The 'try' block contains code that might raise an exception. It must be followed by at least one 'except' clause to handle potential errors."
+        },
+        {
+          "value": 400,
+          "question": "This exception is raised when a variable is not defined.",
+          "answer": "What is NameError?",
+          "explanation": "NameError occurs when you try to use a variable that hasn't been defined yet. For example, print(undefined_var) raises NameError: name 'undefined_var' is not defined."
+        },
+        {
+          "value": 600,
+          "question": "True or False: Multiple except clauses can follow a single try block.",
+          "answer": "What is True?",
+          "explanation": "You can have multiple except clauses to handle different exception types. The first matching except block is executed. You can also use a generic except clause as a catch-all."
+        },
+        {
+          "value": 800,
+          "question": "This clause in a try-except-finally block always executes, regardless of whether an exception occurred.",
+          "answer": "What is finally?",
+          "explanation": "The 'finally' block runs after try and except blocks, whether an exception was raised or not. It's commonly used to clean up resources like closing files or database connections."
+        },
+        {
+          "value": 1000,
+          "question": "This keyword manually raises an exception with a custom message.",
+          "answer": "What is raise?",
+          "explanation": "The 'raise' statement allows you to throw an exception intentionally. For example, raise ValueError('Invalid input') creates and raises a custom error with a message."
+        }
+      ]
+    }
+  ]
+}
