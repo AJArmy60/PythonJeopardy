@@ -1,21 +1,55 @@
 // game.js
 // All game state and logic for the Python Jeopardy game.
-// No server needed — everything runs in the browser.
+// Loads questions directly from questions.json — no separate questions.js needed.
 //
-// How to use from your frontend JS:
+// IMPORTANT: Call GameState.init() once when the page loads before anything else.
+// It's async because it fetches the JSON file.
 //
+// Basic usage:
+//
+//   await GameState.init();         // load questions.json
 //   GameState.addTeam("Team A");
 //   GameState.awardPoints("Team A", 400);
 //   GameState.markAnswered("loops_400");
-//   GameState.getState();  // returns current scores, teams, answered list
-//   GameState.reset();     // wipe scores + answered, keep teams
-//   GameState.fullReset(); // wipe everything
+//   GameState.getBoard();           // build the grid
+//   GameState.getState();           // snapshot of scores, teams, answered
+//   GameState.reset();              // wipe scores + board, keep teams
+//   GameState.fullReset();          // wipe everything
 
 const GameState = (() => {
   // Private state
+  let categories = [];  // ordered category names from JSON
+  let questions = {};   // { "Python Basics": [{ id, value, question, answer, explanation }, ...] }
   let teams = [];       // ordered list of team names
   let scores = {};      // { "Team A": 400, "Team B": 200 }
   let answered = new Set(); // set of answered question IDs
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+
+  /**
+   * Fetch and parse questions.json, then build the internal question map.
+   * Must be awaited before calling getBoard() or findQuestion().
+   *
+   * The JSON uses "clues" and doesn't have IDs — we generate IDs here from
+   * the category name + point value (e.g. "python-basics_200").
+   */
+  async function init(jsonPath = 'questions.json') {
+    const response = await fetch(jsonPath);
+    const data = await response.json();
+
+    categories = data.categories.map((cat) => cat.name);
+
+    for (const cat of data.categories) {
+      questions[cat.name] = cat.clues.map((clue) => ({
+        // Generate a stable ID from category + value
+        id: `${cat.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}_${clue.value}`,
+        value: clue.value,
+        question: clue.question,
+        answer: clue.answer,
+        explanation: clue.explanation || "",
+      }));
+    }
+  }
 
   // ── Teams ──────────────────────────────────────────────────────────────────
 
@@ -40,9 +74,7 @@ const GameState = (() => {
     return true;
   }
 
-  /**
-   * Returns the list of team names in order.
-   */
+  /** Returns the list of team names in order. */
   function getTeams() {
     return [...teams];
   }
@@ -59,16 +91,14 @@ const GameState = (() => {
     return true;
   }
 
-  /**
-   * Returns a copy of the scores object: { "Team A": 400, ... }
-   */
+  /** Returns a copy of the scores object: { "Team A": 400, ... } */
   function getScores() {
     return { ...scores };
   }
 
   /**
    * Returns the team currently in the lead, or null if no teams exist.
-   * In a tie, returns the first team alphabetically.
+   * In a tie, returns the first-added team.
    */
   function getLeader() {
     if (teams.length === 0) return null;
@@ -79,63 +109,50 @@ const GameState = (() => {
 
   // ── Questions ──────────────────────────────────────────────────────────────
 
-  /**
-   * Mark a question ID as answered so it can't be selected again.
-   */
+  /** Mark a question ID as answered so its tile can be greyed out. */
   function markAnswered(questionId) {
     answered.add(questionId);
   }
 
-  /**
-   * Returns true if the question has already been answered.
-   */
+  /** Returns true if the question has already been answered. */
   function isAnswered(questionId) {
     return answered.has(questionId);
   }
 
-  /**
-   * Returns true if every question on the board has been answered.
-   */
+  /** Returns true if every question on the board has been answered. */
   function isBoardComplete() {
-    const allIds = Object.values(QUESTIONS)
-      .flat()
-      .map((q) => q.id);
+    const allIds = Object.values(questions).flat().map((q) => q.id);
     return allIds.every((id) => answered.has(id));
   }
 
-  // ── Lookup Helpers ─────────────────────────────────────────────────────────
-
   /**
-   * Find and return a question object by its ID, or null if not found.
+   * Find and return a full question object by its ID, or null if not found.
+   * Returns: { id, value, question, answer, explanation }
    */
   function findQuestion(questionId) {
-    for (const categoryQuestions of Object.values(QUESTIONS)) {
-      const match = categoryQuestions.find((q) => q.id === questionId);
+    for (const clues of Object.values(questions)) {
+      const match = clues.find((q) => q.id === questionId);
       if (match) return match;
     }
     return null;
   }
 
   /**
-   * Build the full board structure the frontend needs to render the grid.
-   * Returns an array of category objects, each with their clues and answered status.
+   * Build the board structure for the frontend to render the grid.
    *
-   * Example return value:
+   * Returns:
    * [
    *   {
    *     name: "Python Basics",
-   *     clues: [
-   *       { id: "basics_200", value: 200, answered: false },
-   *       ...
-   *     ]
+   *     clues: [{ id, value, answered }, ...]
    *   },
    *   ...
    * ]
    */
   function getBoard() {
-    return CATEGORIES.map((cat) => ({
+    return categories.map((cat) => ({
       name: cat,
-      clues: QUESTIONS[cat].map((q) => ({
+      clues: questions[cat].map((q) => ({
         id: q.id,
         value: q.value,
         answered: isAnswered(q.id),
@@ -145,10 +162,7 @@ const GameState = (() => {
 
   // ── State Snapshot ─────────────────────────────────────────────────────────
 
-  /**
-   * Returns a snapshot of the full game state.
-   * Useful for saving to sessionStorage or passing to a results screen.
-   */
+  /** Returns a full snapshot of current game state. */
   function getState() {
     return {
       teams: getTeams(),
@@ -162,19 +176,15 @@ const GameState = (() => {
   // ── Reset ──────────────────────────────────────────────────────────────────
 
   /**
-   * Soft reset: zero out all scores and clear answered questions.
-   * Teams are kept so you can play again without re-entering names.
+   * Soft reset: zero all scores and clear answered questions.
+   * Keeps teams so players can replay without re-entering names.
    */
   function reset() {
-    for (const team of teams) {
-      scores[team] = 0;
-    }
+    for (const team of teams) scores[team] = 0;
     answered.clear();
   }
 
-  /**
-   * Full reset: wipe everything back to a blank slate.
-   */
+  /** Full reset: wipe teams, scores, and answered. Questions stay loaded. */
   function fullReset() {
     teams = [];
     scores = {};
@@ -183,6 +193,7 @@ const GameState = (() => {
 
   // ── Public API ─────────────────────────────────────────────────────────────
   return {
+    init,
     // Teams
     addTeam,
     removeTeam,
