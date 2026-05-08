@@ -11,6 +11,10 @@
   <header>
     <h1>Python Jeopardy!</h1>
     <div id="scoreboard"></div>
+    <div id="turn-indicator" class="hidden">
+      <span>Current Turn:</span>
+      <strong id="turn-team"></strong>
+    </div>
     <div id="header-controls">
       <button id="add-team-btn">+ Add Team</button>
       <button id="reset-btn">Reset Game</button>
@@ -50,10 +54,12 @@
       </div>
       <div id="modal-actions">
         <button id="show-answer-btn">Show Answer</button>
-        <div id="award-section" class="hidden">
-          <p class="award-label">Award points to:</p>
-          <div id="team-award-buttons"></div>
-          <button id="no-award-btn">No One / Close</button>
+        <div id="result-section" class="hidden">
+          <p class="award-label">Did <span id="result-team-name"></span> get it right?</p>
+          <div id="result-buttons">
+            <button id="correct-btn" class="award-btn">Correct</button>
+            <button id="incorrect-btn" class="award-btn">Incorrect</button>
+          </div>
         </div>
       </div>
     </div>
@@ -68,7 +74,7 @@
     </div>
   </div>
 
-  <script src="game.js"></script>
-  <script src="app.js"></script>
+  <script src="game.js?v=2"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>

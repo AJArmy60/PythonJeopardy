@@ -16,6 +16,8 @@
   const addTeamBtn      = document.getElementById('add-team-btn');
   const resetBtn        = document.getElementById('reset-btn');
   const scoreboard      = document.getElementById('scoreboard');
+  const turnIndicator   = document.getElementById('turn-indicator');
+  const turnTeamEl      = document.getElementById('turn-team');
 
   const modalOverlay    = document.getElementById('modal-overlay');
   const closeModalBtn   = document.getElementById('close-modal-btn');
@@ -26,15 +28,17 @@
   const answerText      = document.getElementById('answer-text');
   const explanationText = document.getElementById('explanation-text');
   const showAnswerBtn   = document.getElementById('show-answer-btn');
-  const awardSection    = document.getElementById('award-section');
-  const teamAwardBtns   = document.getElementById('team-award-buttons');
-  const noAwardBtn      = document.getElementById('no-award-btn');
+  const resultSection   = document.getElementById('result-section');
+  const resultTeamName  = document.getElementById('result-team-name');
+  const correctBtn      = document.getElementById('correct-btn');
+  const incorrectBtn    = document.getElementById('incorrect-btn');
 
   const finalOverlay    = document.getElementById('final-overlay');
   const finalScores     = document.getElementById('final-scores');
   const playAgainBtn    = document.getElementById('play-again-btn');
 
   let activeQuestionId = null;
+  let currentTeamIndex = 0;
 
   // ── Setup screen ─────────────────────────────────────────────────────────
   function refreshSetupTeams() {
@@ -69,7 +73,9 @@
 
   startGameBtn.addEventListener('click', () => {
     setupOverlay.style.display = 'none';
+    currentTeamIndex = 0;
     renderScoreboard();
+    renderTurnIndicator();
     renderBoard();
   });
 
@@ -77,8 +83,10 @@
   addTeamBtn.addEventListener('click', () => {
     const name = prompt('Enter team name:');
     if (name && name.trim()) {
-      GameState.addTeam(name.trim());
-      renderScoreboard();
+      if (GameState.addTeam(name.trim())) {
+        renderScoreboard();
+        renderTurnIndicator();
+      }
     }
   });
 
@@ -86,7 +94,9 @@
   resetBtn.addEventListener('click', () => {
     if (confirm('Reset scores and board? Teams will be kept.')) {
       GameState.reset();
+      currentTeamIndex = 0;
       renderScoreboard();
+      renderTurnIndicator();
       renderBoard();
     }
   });
@@ -94,10 +104,13 @@
   // ── Scoreboard ───────────────────────────────────────────────────────────
   function renderScoreboard() {
     const scores = GameState.getScores();
+    const teams = GameState.getTeams();
+    const currentTeam = teams[currentTeamIndex] ?? null;
     scoreboard.innerHTML = '';
-    for (const [team, score] of Object.entries(scores)) {
+    for (const team of teams) {
+      const score = scores[team] || 0;
       const card = document.createElement('div');
-      card.className = 'score-card';
+      card.className = 'score-card' + (team === currentTeam ? ' active-turn' : '');
       card.dataset.team = team;
       card.innerHTML = `<span class="team-name">${escHtml(team)}</span><span class="team-score">$${score.toLocaleString()}</span>`;
       scoreboard.appendChild(card);
@@ -110,6 +123,30 @@
     if (card) {
       card.querySelector('.team-score').textContent = '$' + (scores[team] || 0).toLocaleString();
     }
+  }
+
+  function getCurrentTeam() {
+    const teams = GameState.getTeams();
+    if (teams.length === 0) return null;
+    if (currentTeamIndex >= teams.length) currentTeamIndex = 0;
+    return teams[currentTeamIndex];
+  }
+
+  function nextTurn() {
+    const teams = GameState.getTeams();
+    if (teams.length === 0) return;
+    currentTeamIndex = (currentTeamIndex + 1) % teams.length;
+  }
+
+  function renderTurnIndicator() {
+    const team = getCurrentTeam();
+    if (!team) {
+      turnIndicator.classList.add('hidden');
+      turnTeamEl.textContent = '';
+      return;
+    }
+    turnTeamEl.textContent = team;
+    turnIndicator.classList.remove('hidden');
   }
 
   // ── Board ─────────────────────────────────────────────────────────────────
@@ -170,8 +207,9 @@
 
     // Reset state
     modalAnswer.classList.add('hidden');
-    awardSection.classList.add('hidden');
+    resultSection.classList.add('hidden');
     showAnswerBtn.classList.remove('hidden');
+    resultTeamName.textContent = getCurrentTeam() || 'Current Team';
 
     modalOverlay.classList.remove('hidden');
   }
@@ -195,29 +233,34 @@
   showAnswerBtn.addEventListener('click', () => {
     modalAnswer.classList.remove('hidden');
     showAnswerBtn.classList.add('hidden');
-    awardSection.classList.remove('hidden');
-    renderAwardButtons();
+    resultSection.classList.remove('hidden');
   });
 
-  function renderAwardButtons() {
-    teamAwardBtns.innerHTML = '';
-    for (const team of GameState.getTeams()) {
-      const btn = document.createElement('button');
-      btn.className = 'award-btn';
-      btn.textContent = escHtml(team);
-      btn.addEventListener('click', () => {
-        if (activeQuestionId) {
-          const q = GameState.findQuestion(activeQuestionId);
-          GameState.awardPoints(team, q.value);
-          updateScoreCard(team);
-        }
-        closeModal();
-      });
-      teamAwardBtns.appendChild(btn);
+  correctBtn.addEventListener('click', () => {
+    const team = getCurrentTeam();
+    if (team && activeQuestionId) {
+      const q = GameState.findQuestion(activeQuestionId);
+      GameState.awardPoints(team, q.value);
+      updateScoreCard(team);
     }
-  }
+    nextTurn();
+    renderTurnIndicator();
+    renderScoreboard();
+    closeModal();
+  });
 
-  noAwardBtn.addEventListener('click', closeModal);
+  incorrectBtn.addEventListener('click', () => {
+    const team = getCurrentTeam();
+    if (team && activeQuestionId) {
+      const q = GameState.findQuestion(activeQuestionId);
+      GameState.awardPoints(team, -q.value);
+      updateScoreCard(team);
+    }
+    nextTurn();
+    renderTurnIndicator();
+    renderScoreboard();
+    closeModal();
+  });
 
   // ── Game Over ─────────────────────────────────────────────────────────────
   function showFinalScores() {
@@ -239,7 +282,9 @@
 
   playAgainBtn.addEventListener('click', () => {
     GameState.reset();
+    currentTeamIndex = 0;
     finalOverlay.classList.add('hidden');
+    renderTurnIndicator();
     renderScoreboard();
     renderBoard();
   });

@@ -41,6 +41,25 @@ header h1 {
   flex: 1;
 }
 
+#turn-indicator {
+  background: #000080;
+  border: 2px solid #f5c518;
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #ddd;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#turn-team {
+  color: #f5c518;
+  font-size: 1rem;
+}
+
 .score-card {
   background: #000080;
   border: 2px solid #f5c518;
@@ -62,6 +81,11 @@ header h1 {
 .score-card .team-score {
   font-size: 1.4rem;
   color: #f5c518;
+}
+
+.score-card.active-turn {
+  border-color: #ffd740;
+  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.35);
 }
 
 #header-controls {
@@ -375,6 +399,12 @@ main {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: center;
+}
+
+#result-buttons {
+  display: flex;
+  gap: 10px;
   justify-content: center;
 }
 
